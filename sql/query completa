@@ -1,0 +1,63 @@
+
+SELECT t1.country_name,npop,nairports,CAST(nairports AS float)/npop*1000 AS pc
+FROM
+
+-- paises con poblacion
+(SELECT country_name, SUM(population) AS npop
+FROM optd_por_public
+WHERE population IS NOT NULL
+GROUP BY country_name) AS t1,
+
+-- paises con aeropuertos 
+(SELECT country_name, COUNT(*) AS nairports 
+FROM optd_por_public
+WHERE location_type='A' OR location_type='CA'
+GROUP BY country_name) AS t2
+
+-- criterio para unir las dos tablas
+WHERE t1.country_name=t2.country_name
+      AND npop > 0
+ORDER BY pc DESC LIMIT 10;
+
+
+
+
+
+  country_name  |   npop   | nairports | pc 
+----------------+----------+-----------+----
+ Eritrea        |   612083 |         4 |  0
+ Cambodia       |  1869693 |        16 |  0
+ Turkey         | 32241348 |        67 |  0
+ Chad           |  1084970 |        19 |  0
+ Cyprus         |   465211 |         5 |  0
+ Samoa          |    47449 |         5 |  0
+ Kiribati       |    40311 |        21 |  0
+ Cayman Islands |    29370 |         3 |  0
+ Slovenia       |   367391 |         3 |  0
+ Costa Rica     |   582947 |        27 |  0
+(10 rows)
+
+
+ver esta create view population AS 
+SELECT country_name, SUM(population) AS npop
+FROM optd_por_public
+WHERE population IS NOT NULL
+GROUP BY country_name;query como una tabla y como una vista 
+
+=
+
+
+
+SELECT population.country_name,npop,nairports
+FROM population, airports
+WHERE population.country_name = airports.country_name
+ORDER BY npop DESC LIMIT 10; 
+
+SELECT population.country_name,npop,nairports
+FROM population INNER JOIN airports
+ON population.country_name = airports.country_name
+ORDER BY npop DESC LIMIT 10; 
+
+
+
+
